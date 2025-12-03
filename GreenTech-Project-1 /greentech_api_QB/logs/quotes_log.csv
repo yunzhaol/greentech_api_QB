@@ -1,0 +1,3 @@
+timestamp,reference,customer_name,items_count,subtotal,currency,status,pdf_path,qbo_estimate_id,error
+2025-11-18T03:14:56Z,GT-TEST-001,Alex Smith,4,1270.00,CAD,mock_created,Quotes/Estimate_GT-TEST-001.pdf,,
+2025-11-18T03:29:28Z,GT-TEST-001,Alex Smith,4,1270.00,CAD,mock_created,Quotes/Estimate_GT-TEST-001.pdf,,

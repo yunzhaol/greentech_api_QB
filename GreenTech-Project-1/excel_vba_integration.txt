@@ -1,0 +1,365 @@
+' ======================================================================
+' GreenTech Painting - One-Click Estimate Generator
+' VBA Code for Excel Integration
+' ======================================================================
+
+Option Explicit
+
+' ======================================================================
+' CONFIGURATION - UPDATE THESE PATHS FOR YOUR SYSTEM
+' ======================================================================
+
+' Path to Python executable
+Const PYTHON_PATH As String = "C:\Python39\python.exe"  ' or "/usr/local/bin/python3" on Mac
+
+' Path to your API folder
+Const API_FOLDER As String = "C:\GreenTech\greentech_api_QB\"  ' or "/Users/yunzhaoli/Desktop/greentech_api_QB/" on Mac
+
+' Path to the CLI script
+Const CLI_SCRIPT As String = "cli_push_estimate.py"
+
+' Output folder for JSON files
+Const OUTPUT_FOLDER As String = "output\"
+
+' ======================================================================
+' MAIN FUNCTION - CALLED BY "CREATE ESTIMATE" BUTTON
+' ======================================================================
+
+Sub CreateQuickBooksEstimate()
+    ' This is the ONE-CLICK function that does everything!
+    
+    On Error GoTo ErrorHandler
+    
+    ' Show progress
+    Application.ScreenUpdating = False
+    Application.StatusBar = "Creating QuickBooks estimate..."
+    
+    ' Step 1: Validate data in Excel
+    If Not ValidateExcelData() Then
+        MsgBox "Please fill in all required fields (Customer name, items, prices)", vbExclamation
+        Exit Sub
+    End If
+    
+    ' Step 2: Export Excel data to JSON file
+    Dim jsonPath As String
+    jsonPath = ExportToJSON()
+    
+    If jsonPath = "" Then
+        MsgBox "Failed to create JSON file", vbCritical
+        Exit Sub
+    End If
+    
+    ' Step 3: Call Python script
+    Dim result As String
+    result = CallPythonScript(jsonPath)
+    
+    ' Step 4: Parse result and update Excel
+    ParseResultAndUpdate result
+    
+    ' Cleanup
+    Application.StatusBar = False
+    Application.ScreenUpdating = True
+    
+    MsgBox "✅ Estimate created successfully!" & vbCrLf & vbCrLf & _
+           "Check QuickBooks and the Quotes folder for your PDF.", vbInformation, "Success"
+    
+    Exit Sub
+    
+ErrorHandler:
+    Application.StatusBar = False
+    Application.ScreenUpdating = True
+    MsgBox "❌ Error: " & Err.Description, vbCritical, "Error"
+End Sub
+
+' ======================================================================
+' VALIDATE EXCEL DATA
+' ======================================================================
+
+Private Function ValidateExcelData() As Boolean
+    ' Check if required fields are filled
+    
+    Dim ws As Worksheet
+    Set ws = ActiveSheet
+    
+    ' Check customer name (assume it's in cell B2)
+    If Trim(ws.Range("B2").Value) = "" Then
+        ValidateExcelData = False
+        Exit Function
+    End If
+    
+    ' Check if there's at least one item (assume items start at row 10)
+    If Trim(ws.Range("A10").Value) = "" Then
+        ValidateExcelData = False
+        Exit Function
+    End If
+    
+    ValidateExcelData = True
+End Function
+
+' ======================================================================
+' EXPORT EXCEL DATA TO JSON
+' ======================================================================
+
+Private Function ExportToJSON() As String
+    ' Reads data from Excel and creates JSON file
+    
+    Dim ws As Worksheet
+    Set ws = ActiveSheet
+    
+    ' Get customer info
+    Dim customerName As String
+    Dim customerEmail As String
+    Dim customerPhone As String
+    
+    customerName = ws.Range("B2").Value
+    customerEmail = ws.Range("B3").Value
+    customerPhone = ws.Range("B4").Value
+    
+    ' Generate reference number
+    Dim reference As String
+    reference = "GT-" & Format(Now, "YYYYMMDD-HHNNSS")
+    
+    ' Get today's date
+    Dim quoteDate As String
+    quoteDate = Format(Date, "YYYY-MM-DD")
+    
+    ' Build JSON string
+    Dim json As String
+    json = "{"
+    json = json & """customer"": {"
+    json = json & """display_name"": """ & customerName & ""","
+    json = json & """email"": """ & customerEmail & ""","
+    json = json & """phone"": """ & customerPhone & """"
+    json = json & "},"
+    json = json & """quote"": {"
+    json = json & """reference"": """ & reference & ""","
+    json = json & """date"": """ & quoteDate & """"
+    json = json & "},"
+    
+    ' Add items (assume items start at row 10, columns A=description, B=qty, C=price)
+    json = json & """items"": ["
+    
+    Dim row As Long
+    row = 10
+    Dim itemCount As Integer
+    itemCount = 0
+    
+    Do While Trim(ws.Cells(row, 1).Value) <> ""
+        If itemCount > 0 Then json = json & ","
+        
+        Dim desc As String
+        Dim qty As Double
+        Dim price As Double
+        
+        desc = ws.Cells(row, 1).Value
+        qty = CDbl(ws.Cells(row, 2).Value)
+        price = CDbl(ws.Cells(row, 3).Value)
+        
+        json = json & "{"
+        json = json & """description"": """ & desc & ""","
+        json = json & """qty"": " & qty & ","
+        json = json & """unit_price"": " & price
+        json = json & "}"
+        
+        itemCount = itemCount + 1
+        row = row + 1
+    Loop
+    
+    json = json & "],"
+    
+    ' Add sustainability data (if available)
+    Dim trees As Double
+    Dim co2 As Double
+    Dim water As Double
+    
+    trees = 0
+    co2 = 0
+    water = 0
+    
+    ' Try to get sustainability values (adjust cell references as needed)
+    On Error Resume Next
+    trees = CDbl(ws.Range("F2").Value)
+    co2 = CDbl(ws.Range("F3").Value)
+    water = CDbl(ws.Range("F4").Value)
+    On Error GoTo 0
+    
+    json = json & """sustainability"": {"
+    json = json & """trees"": " & trees & ","
+    json = json & """co2_tons"": " & co2 & ","
+    json = json & """water_liters"": " & water
+    json = json & "},"
+    
+    json = json & """currency"": ""CAD"""
+    json = json & "}"
+    
+    ' Save JSON to file
+    Dim outputPath As String
+    outputPath = API_FOLDER & OUTPUT_FOLDER & "quote_" & Format(Now, "YYYYMMDD_HHNNSS") & ".json"
+    
+    ' Create output folder if it doesn't exist
+    On Error Resume Next
+    MkDir API_FOLDER & OUTPUT_FOLDER
+    On Error GoTo 0
+    
+    ' Write JSON to file
+    Dim fso As Object
+    Dim file As Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    Set file = fso.CreateTextFile(outputPath, True)
+    file.Write json
+    file.Close
+    
+    ExportToJSON = outputPath
+End Function
+
+' ======================================================================
+' CALL PYTHON SCRIPT
+' ======================================================================
+
+Private Function CallPythonScript(jsonPath As String) As String
+    ' Executes the Python CLI script and captures output
+    
+    Dim shell As Object
+    Set shell = CreateObject("WScript.Shell")
+    
+    ' Build command
+    Dim cmd As String
+    cmd = """" & PYTHON_PATH & """ "
+    cmd = cmd & """" & API_FOLDER & CLI_SCRIPT & """ "
+    cmd = cmd & "--json """ & jsonPath & """"
+    
+    ' Execute and wait for completion
+    Application.StatusBar = "Calling QuickBooks API..."
+    
+    ' Run command and capture output
+    Dim exec As Object
+    Set exec = shell.exec(cmd)
+    
+    ' Wait for completion (with timeout)
+    Dim timeout As Integer
+    timeout = 0
+    Do While exec.Status = 0 And timeout < 60  ' 60 second timeout
+        Application.Wait (Now + TimeValue("0:00:01"))
+        timeout = timeout + 1
+    Loop
+    
+    ' Get output
+    Dim output As String
+    output = exec.StdOut.ReadAll
+    
+    If exec.ExitCode <> 0 Then
+        ' Error occurred
+        Dim errorOutput As String
+        errorOutput = exec.StdErr.ReadAll
+        MsgBox "Python script error:" & vbCrLf & errorOutput, vbCritical
+        CallPythonScript = ""
+    Else
+        CallPythonScript = output
+    End If
+End Function
+
+' ======================================================================
+' PARSE RESULT AND UPDATE EXCEL
+' ======================================================================
+
+Private Sub ParseResultAndUpdate(result As String)
+    ' Parses the JSON result from Python and updates Excel
+    
+    ' Find the "RESULT JSON:" section
+    Dim jsonStart As Long
+    jsonStart = InStr(result, "{")
+    
+    If jsonStart = 0 Then Exit Sub
+    
+    Dim jsonText As String
+    jsonText = Mid(result, jsonStart)
+    
+    ' Simple parsing (for robust parsing, consider using a JSON library)
+    Dim ws As Worksheet
+    Set ws = ActiveSheet
+    
+    ' Extract key values
+    Dim estimateId As String
+    Dim pdfPath As String
+    Dim status As String
+    
+    estimateId = ExtractJsonValue(jsonText, "estimate_id")
+    pdfPath = ExtractJsonValue(jsonText, "pdf_path")
+    status = ExtractJsonValue(jsonText, "status")
+    
+    ' Update Excel with results (adjust cell references as needed)
+    ws.Range("H2").Value = "Estimate ID: " & estimateId
+    ws.Range("H3").Value = "Status: " & status
+    ws.Range("H4").Value = "PDF: " & pdfPath
+    ws.Range("H5").Value = "Created: " & Format(Now, "YYYY-MM-DD HH:NN:SS")
+    
+    ' Open the PDF folder (optional)
+    ' Shell "explorer.exe """ & API_FOLDER & "Quotes""", vbNormalFocus
+End Sub
+
+' ======================================================================
+' HELPER: EXTRACT VALUE FROM JSON STRING
+' ======================================================================
+
+Private Function ExtractJsonValue(jsonText As String, key As String) As String
+    ' Simple JSON value extraction
+    
+    Dim searchStr As String
+    searchStr = """" & key & """: """
+    
+    Dim startPos As Long
+    startPos = InStr(jsonText, searchStr)
+    
+    If startPos = 0 Then
+        ExtractJsonValue = ""
+        Exit Function
+    End If
+    
+    startPos = startPos + Len(searchStr)
+    
+    Dim endPos As Long
+    endPos = InStr(startPos, jsonText, """")
+    
+    If endPos = 0 Then
+        ExtractJsonValue = ""
+        Exit Function
+    End If
+    
+    ExtractJsonValue = Mid(jsonText, startPos, endPos - startPos)
+End Function
+
+' ======================================================================
+' HELPER: OPEN QUOTES FOLDER
+' ======================================================================
+
+Sub OpenQuotesFolder()
+    ' Button to open the Quotes folder
+    
+    Dim quotesPath As String
+    quotesPath = API_FOLDER & "Quotes"
+    
+    On Error Resume Next
+    
+    ' Windows
+    Shell "explorer.exe """ & quotesPath & """", vbNormalFocus
+    
+    ' Mac (alternative)
+    ' Shell "open """ & quotesPath & """", vbNormalFocus
+    
+    On Error GoTo 0
+End Sub
+
+' ======================================================================
+' HELPER: VIEW LOGS
+' ======================================================================
+
+Sub OpenLogsFile()
+    ' Button to open the CSV log file
+    
+    Dim logPath As String
+    logPath = API_FOLDER & "logs\quotes_log.csv"
+    
+    On Error Resume Next
+    Workbooks.Open logPath
+    On Error GoTo 0
+End Sub

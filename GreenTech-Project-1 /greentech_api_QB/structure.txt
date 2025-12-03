@@ -1,0 +1,24 @@
+.
+├── Quotes
+│   └── Estimate_GT-TEST-001.pdf
+├── SETUP_GUIDE.md
+├── __pycache__
+│   ├── mapping.cpython-312.pyc
+│   ├── oauth.cpython-312.pyc
+│   └── quickbooks_client.cpython-312.pyc
+├── cli_push_estimate.py
+├── implementation_summary.md
+├── initial_oauth_setup.py
+├── logs
+│   └── quotes_log.csv
+├── mapping.py
+├── oauth.py
+├── quick_start.md
+├── quickbooks_client.py
+├── requirements_txt.txt
+├── run_tests.py
+├── samples
+│   └── quote_sample.json
+└── structure.txt
+
+5 directories, 17 files

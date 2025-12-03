@@ -1,0 +1,24 @@
+timestamp,reference,customer_name,items_count,subtotal,currency,status,pdf_path,qbo_estimate_id,error
+2025-11-18T03:14:56Z,GT-TEST-001,Alex Smith,4,1270.00,CAD,mock_created,Quotes/Estimate_GT-TEST-001.pdf,,
+2025-11-18T03:29:28Z,GT-TEST-001,Alex Smith,4,1270.00,CAD,mock_created,Quotes/Estimate_GT-TEST-001.pdf,,
+2025-11-28T16:20:06Z,GT-TEST-001,Alex Smith,4,1270.00,CAD,mock_created,Quotes/Estimate_GT-TEST-001.pdf,,
+2025-11-28T16:23:28Z,GT-TEST-001,Alex Smith,4,1270.00,CAD,mock_created,Quotes/Estimate_GT-TEST-001.pdf,,
+2025-11-28T16:59:12Z,GT-TEST-001,Alex Smith,4,1270.00,CAD,mock_created,Quotes/Estimate_GT-TEST-001.pdf,,
+2025-11-28T16:59:32Z,GT-TEST-001,Alex Smith,4,1270.00,CAD,failed,,,"Unexpected error: Token refresh failed: 401 - {""error"":""invalid_client""}"
+2025-11-28T17:08:05Z,GT-TEST-001,Alex Smith,4,1270.00,CAD,failed,,,"Unexpected error: Token refresh failed: 401 - {""error"":""invalid_client""}"
+2025-11-28T17:11:16Z,GT-TEST-001,Alex Smith,4,1270.00,CAD,mock_created,Quotes/Estimate_GT-TEST-001.pdf,,
+2025-11-28T17:20:10Z,GT-TEST-001,Alex Smith,4,0.00,CAD,created,Quotes/Estimate_GT-TEST-001.pdf,152,
+2025-11-28T17:38:23Z,GT-TEST-001,Alex Smith,4,0.00,CAD,created,Quotes/Estimate_GT-TEST-001.pdf,153,
+2025-11-28T18:00:55Z,GT-TEST-001,Alex Smith,4,1270.00,CAD,mock_created,Quotes/Estimate_GT-TEST-001.pdf,,
+2025-11-28T18:01:21Z,GT-TEST-001,Alex Smith,4,0.00,CAD,created,Quotes/Estimate_GT-TEST-001.pdf,154,
+2025-11-28T18:42:59Z,GT-TEST-001,Alex Smith,4,1270.00,CAD,failed,,,"Unexpected error: Token refresh failed: 401 - {""error"":""invalid_client""}"
+2025-11-28T18:43:35Z,GT-TEST-001,Alex Smith,4,1270.00,CAD,failed,,,"Unexpected error: Token refresh failed: 401 - {""error"":""invalid_client""}"
+2025-11-28T18:45:24Z,GT-TEST-001,Alex Smith,4,0.00,CAD,created,Quotes/Estimate_GT-TEST-001.pdf,155,
+2025-11-28T18:48:16Z,GT-TEST-001,Alex Smith,4,1270.00,CAD,mock_created,Quotes/Estimate_GT-TEST-001.pdf,,
+2025-11-28T18:48:28Z,GT-TEST-001,Alex Smith,4,0.00,CAD,created,Quotes/Estimate_GT-TEST-001.pdf,156,
+2025-11-28T18:53:07Z,GT-TEST-001,Alex Smith,4,0.00,CAD,created,Quotes/Estimate_GT-TEST-001.pdf,158,
+2025-11-28T18:53:44Z,GT-TEST-001,Alex Smith,4,0.00,CAD,created,Quotes/Estimate_GT-TEST-001.pdf,159,
+2025-11-28T18:57:24Z,GT-TEST-001,Alex Smith,4,0.00,CAD,created,Quotes/Estimate_GT-TEST-001.pdf,160,
+2025-11-28T18:58:05Z,GT-TEST-001,Alex Smith,4,1270.00,CAD,failed,,,"QuickBooks API Error: Required param missing, need to supply the required value for the API"
+2025-11-28T18:58:24Z,GT-TEST-001,Alex Smith,4,1270.00,CAD,created,Quotes/Estimate_GT-TEST-001.pdf,161,
+2025-11-28T19:00:49Z,GT-TEST-001,Alex Smith,4,1270.00,CAD,created,Quotes/Estimate_GT-TEST-001.pdf,162,

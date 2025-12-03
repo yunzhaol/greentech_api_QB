@@ -1,0 +1,7 @@
+age_band,action,bid_modifier,rationale
+18-24,exclude,exclude,Extreme high CPCV (178.50 vs baseline 53.08)
+25-34,exclude,exclude,Extreme high CPCV (136.50 vs baseline 53.08)
+35-44,keep,0%,CR 0.85×base; CPCV 0.79×base; clicks=320
+45-54,up,+10%,CR 1.12×base; CPCV 0.56×base; clicks=450
+55-64,up,+25%,CR 1.39×base; CPCV 0.41×base; clicks=280
+65+,up,+15%,CR 1.23×base; CPCV 0.48×base; clicks=190

@@ -1,0 +1,16 @@
+{
+  "baselines": {
+    "base_cr": 0.04881936977980437,
+    "base_ctr": 0.014734786329744237,
+    "base_cpc": 1.701954397394137,
+    "base_cpcv": 53.08351791530944
+  },
+  "high_value": {
+    "cr_threshold": 1.2299099993306724,
+    "cpcv_threshold": 0.4771725950870854
+  },
+  "low_value": {
+    "cr_threshold": 0.47185898882375,
+    "cpcv_threshold": 2.967022650067744
+  }
+}

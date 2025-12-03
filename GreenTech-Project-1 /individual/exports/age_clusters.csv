@@ -1,0 +1,7 @@
+age_band,clicks,conv_rate,ctr,avg_cpc,cpcv,value_score,cluster,confidence,action,bid_modifier,evidence
+18-24,85,1.18,0.8,2.1,178.5,0.5146,L,1.0,exclude,exclude,Extreme high CPCV (178.50 vs baseline 53.08)
+25-34,210,1.43,1.1,1.95,136.5,0.5237,L,1.0,exclude,exclude,Extreme high CPCV (136.50 vs baseline 53.08)
+35-44,320,4.06,1.5,1.7,41.85,0.9608,M,1.0,keep,0%,CR 0.85×base; CPCV 0.79×base; clicks=320
+45-54,450,5.56,1.5,1.65,29.7,1.1656,H,1.0,up,+10%,CR 1.12×base; CPCV 0.56×base; clicks=450
+55-64,280,7.14,1.8,1.55,21.7,1.4235,H,1.0,up,+25%,CR 1.39×base; CPCV 0.41×base; clicks=280
+65+,190,6.32,1.6,1.6,25.33,1.2714,H,1.0,up,+15%,CR 1.23×base; CPCV 0.48×base; clicks=190
